@@ -1,4 +1,7 @@
-# signal-export: PDF friendly
+# signal-export:
+
+This is an adaptation of https://github.com/LiroyvH/signal-export, primarily for simplifying the usage on Macs with Apple Silicon. The primary change is that it does not require running binaries in x86 mode, i.e, no Rosetta needed.
+
 Export/backup chats from the [Signal](https://www.signal.org/) [Desktop app](https://www.signal.org/download/) to Markdown and HTML files with attachments. Each chat is exported as an individual .md/.html file and the attachments for each are stored in a separate folder. Attachments are linked from the Markdown files and displayed in the HTML (pictures, videos, voice notes). This is forked from https://github.com/carderne/signal-export. 
 
 In this fork, I have made changes to the script to ensure PDF files can properly be generated from the output. This version of this script removes all pagination present in the original, for the sake of generating PDF's. It also re-renders emoji's in the HTML-output, so that webkit renders can successfully include emoji's in the output PDF; which is not possible with the original output.
@@ -10,6 +13,7 @@ Please continue reading to find all installation instructions and instructions t
 Everything comes as-is and comes with zero guarantees (of proper or safe operation). Using this tool, any commands or instructions is at your own risk. Do not rely on the output of these scripts and commands as your sole backup and double-check the output. Tool can stop working if Signal changes anything to Signal Desktop. Let's hope they don't make any blocking changes that keep us away from safeguarding our data. :) 
 
 This is a work in progress, more convenience features and commands to automate the process will be added in the near future.  
+
 
 &nbsp;
 ## Example
@@ -26,47 +30,36 @@ This is converted to HTML at the end so it can be opened with any web browser.
 The stylesheet `.css` is still very basic but I'll get to it sooner or later.
 
 &nbsp;
-## Installation - SEMI-AUTOMATED (MacOS ONLY! (at this time))
-- Open up the Terminal-app on your Mac and install [Homebrew](https://brew.sh) by copy/pasting this command and pressing enter:  
-```
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-```  
-It may at some point prompt you for the password of your Mac. Type it in and hit enter, note that you will NOT see anything happening whilst you type. No \*\*\*\*\* or anything.
-- Check if pip is installed by running: `sudo easy_install pip`
-- Now we're going to do the magic, please use the commands for your architecture (Intel/Apple):
-- - For **INTEL** Mac-users: 
-once this is all succesfully installed: to automatically download this script + dependencies and backup all your chats + also convert them to PDF; copy/paste this command to your Terminal and press enter:
-```
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/liroyvh/signal-export/master/MacEasyInstall.sh)"
-```
-- - For **Apple Silicon (M1, M1 Pro, etc.)** Mac-users:
-once this is all succesfully installed: to automatically download this script + dependencies and backup all your chats + also convert them to PDF; copy/paste and run (enter) these two commands in your Terminal one-by-one:
-```
-arch -x86_64 /bin/zsh --login
-/bin/zsh -c "$(curl -fsSL https://raw.githubusercontent.com/liroyvh/signal-export/master/MacEasyInstall.sh)"
-```
-- Now let it do its thing. It can take several minutes and it might prompt you for your Mac's password again. If you have tons and tons of media it can actually take quite some time. Once it's done, a Finder window will open with all your conversations in folders. You can find the PDF copies in the "pdf" folder. 
-- This is for first time use only, for future use (with new backups): jump to the "Usage" chapter.
+## Installation - MANUAL (Only tested for MacOS)
+### 1. Homebrew
+This setup requires [Homebrew](https://brew.sh).
 
 &nbsp;
-## Installation - MANUAL (MacOS and Linux)
 
+### 2. Install pysqlcipher3
 
-First, clone and install requirements (preferably into a virtualenv):
+The pysqlcipher3 from PyPI does not seem to work for Macs with Apple Silicon. So you need to build and install it manually. Follow the instructions from this repo: https://github.com/vktt/pysqlcipher3 
+
+Basically, something like this:
 ```
-git clone https://github.com/liroyvh/signal-export.git
+  brew install openssl sqlcipher
+  export LIBRARY_PATH="$LIBRARY_PATH:$(brew --prefix)/lib" 
+  python setup.py install
+```
+More details on the above repo.
+
+&nbsp;
+### 3. Setup Signal-export
+
+- clone and install requirements (preferably into a virtualenv):
+```
+git clone https://github.com/vktt/signal-export.git
 cd signal-export
 ```
-
-### For MacOS:
-- Install [Homebrew](https://brew.sh).
-- Run `brew install openssl sqlcipher wkhtmltopdf` and if it says permissions are wrong: run the commands it asks you to.
-- NOTE: If you're on an Apple Silicon (M1, M1 Pro, etc.) Mac, you need to switch the architecture and shell before continuing, by running the following command: `arch -x86_64 /bin/zsh --login`. Conversely, if you're on a Mac with Intel CPU using zsh you must first switch to bash. (`arch -x86_64 /bin/bash`)
 - Check if pip is installed: `sudo easy_install pip`
-- Run `pip3 install -r requirements.txt`
+- Run `pip3 install -r requirements.txt` (will install all the dependencies except pysqlcipher3)
 
-
-### For Linux
+## For Linux (untested)
 First get sqlcipher working:
 ```
 sudo apt install libsqlcipher-dev libssl-dev
